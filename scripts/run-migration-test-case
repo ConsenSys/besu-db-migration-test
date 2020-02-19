@@ -3,6 +3,8 @@ set -e
 source common/variables
 source common/functions
 
+echo "Cleaning output directory"
+rm -Rf $OUT_DIR
 testName=$1
 dockerImage=$2
 inputDirectory="input/test/$3"
