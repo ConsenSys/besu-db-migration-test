@@ -1,0 +1,14 @@
+*.bak
+*.swp
+*.iml
+*.launch
+*.swp
+*.log
+.classpath
+.DS_Store
+.gradle/
+.idea/
+target/
+tmp/
+build/
+out/
