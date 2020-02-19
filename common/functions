@@ -19,13 +19,7 @@ getAbsolutePath() {
   echo "$(cd "$(dirname "$1")" && pwd)/$(basename "$1")"
 }
 
-runImportCommand() {
-	testName=$1
-	echo "[$testName] Running import command"
-	dockerImage=$2
-	hostDataPath=$3
-	containerDataPath=$4
-	CMD="docker run --name $testName -d --mount type=bind,source=$hostDataPath,target=$containerDataPath $dockerImage --data-path=$containerDataPath --genesis-file=$containerDataPath/genesis.json blocks import --from=$containerDataPath/ropsten-10-blocks.bin"
-	echo $CMD
-	eval $CMD
+shutdownDocker() {
+  docker stop $1
+	docker rm $1
 }

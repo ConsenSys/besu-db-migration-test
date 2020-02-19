@@ -4,26 +4,39 @@ source common/variables
 source common/functions
 
 waitInterval="5s"
+################################################################################
+########## PREPARE WORKSPACE FOR TEST CASE #####################################
 echo "Cleaning output directory"
 rm -Rf $OUT_DIR
 testName=$1
 dockerImage=$2
 inputDirectory="input/test/$3"
 outputDirectory="$OUT_DIR/$testName/"
-echo "Launching test case: $testName"
-echo "[$testName] Creating output directory: $outputDirectory"
 mkdir -p $outputDirectory
-echo "[$testName] Copying input directory: $inputDirectory"
 hostDataPath=$(getAbsolutePath $outputDirectory)
-echo "[$testName] Mount directory: $hostDataPath"
 cp -R $inputDirectory/* $outputDirectory
-echo "[$testName] Running docker image: $dockerImage"
 containerDataPath="/home/besu"
+################################################################################
+
+################################################################################
+########## RUN IMPORT COMMAND ##################################################
 runImportCommand $testName $dockerImage $hostDataPath $containerDataPath
-echo "[$testName] Waiting $waitInterval for import command to finish"
 sleep $waitInterval
-echo "[$testName] Stopping docker container"
-docker stop $testName
-echo "[$testName] Removing docker container"
-docker rm $testName
+shutdownDocker $testName
+################################################################################
+
+################################################################################
+########## RUN BESU WITH JSON RPC ##############################################
 #docker run -p 8545:8545 $dockerImage --rpc-http-enabled --network=dev
+################################################################################
+
+runImportCommand() {
+	testName=$1
+	echo "[$testName] Running import command"
+	dockerImage=$2
+	hostDataPath=$3
+	containerDataPath=$4
+	CMD="docker run --name $testName -d --mount type=bind,source=$hostDataPath,target=$containerDataPath $dockerImage --data-path=$containerDataPath --genesis-file=$containerDataPath/genesis.json blocks import --from=$containerDataPath/ropsten-10-blocks.bin"
+	echo $CMD
+	eval $CMD
+}
