@@ -3,6 +3,7 @@ set -e
 source common/variables
 source common/functions
 
+waitInterval="10s"
 echo "Cleaning output directory"
 rm -Rf $OUT_DIR
 testName=$1
@@ -14,11 +15,17 @@ echo "[$testName] Creating output directory: $outputDirectory"
 mkdir -p $outputDirectory
 echo "[$testName] Copying input directory: $inputDirectory"
 hostDataPath=$(getAbsolutePath $outputDirectory)
-echo "Mount directory: $hostDataPath"
+echo "[$testName] Mount directory: $hostDataPath"
 cp -R $inputDirectory/* $outputDirectory
 echo "[$testName] Running docker image: $dockerImage"
 containerDataPath="/home/besu"
-CMD="docker run --mount type=bind,source=$hostDataPath,target=$containerDataPath $dockerImage --data-path=$containerDataPath --genesis-file=$containerDataPath/genesis.json blocks import --from=$containerDataPath/ropsten-10-blocks.bin"
+CMD="docker run --name $testName -d --mount type=bind,source=$hostDataPath,target=$containerDataPath $dockerImage --data-path=$containerDataPath --genesis-file=$containerDataPath/genesis.json blocks import --from=$containerDataPath/ropsten-10-blocks.bin"
 echo $CMD
 eval $CMD
+echo "[$testName] Waiting $waitInterval for import command to finish"
+sleep $waitInterval
+echo "[$testName] Stopping docker container"
+docker stop $testName
+echo "[$testName] Removing docker container"
+docker rm $testName
 #docker run -p 8545:8545 $dockerImage --rpc-http-enabled --network=dev
