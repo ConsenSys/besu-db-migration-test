@@ -1,0 +1,13 @@
+#!/bin/bash
+set -e
+source common/variables
+source common/functions
+
+testName=$1
+dockerImage=$2
+inputDirectory="input/test/$3"
+
+echo "Launching test case: $testName"
+echo "[$testName] Using input directory: $inputDirectory"
+echo "[$testName] Running docker image: $dockerImage"
+docker run -p 8545:8545 $dockerImage --rpc-http-enabled --network=dev

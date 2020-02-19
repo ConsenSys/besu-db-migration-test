@@ -1,0 +1,9 @@
+#!/bin/bash
+set -e
+source common/variables
+source common/functions
+
+besuPreVersioningTestCase='Before_Versioning_Was_Enabled'
+besuPreVersioningDockerImage="docker.io/pegasyseng/pantheon:1.2.0"
+besuPreVersioningInputDirectory="version0"
+sh scripts/run-migration-test-case $besuPreVersioningTestCase $besuPreVersioningDockerImage $besuPreVersioningInputDirectory

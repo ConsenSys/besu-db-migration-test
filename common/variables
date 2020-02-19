@@ -1,0 +1,13 @@
+#!/bin/bash
+set -e
+
+DIR="$PWD"
+
+# Input file locations
+INPUT_DIR="$DIR/input"
+GENESIS="$INPUT_DIR/genesis.json"
+# Output file locations
+OUT_DIR="$DIR/out"
+
+# Script locations
+SCRIPTS_DIR="$DIR/scripts"
