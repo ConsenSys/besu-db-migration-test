@@ -3,7 +3,7 @@ set -e
 source common/variables
 source common/functions
 
-waitInterval="10s"
+waitInterval="5s"
 echo "Cleaning output directory"
 rm -Rf $OUT_DIR
 testName=$1
@@ -19,9 +19,7 @@ echo "[$testName] Mount directory: $hostDataPath"
 cp -R $inputDirectory/* $outputDirectory
 echo "[$testName] Running docker image: $dockerImage"
 containerDataPath="/home/besu"
-CMD="docker run --name $testName -d --mount type=bind,source=$hostDataPath,target=$containerDataPath $dockerImage --data-path=$containerDataPath --genesis-file=$containerDataPath/genesis.json blocks import --from=$containerDataPath/ropsten-10-blocks.bin"
-echo $CMD
-eval $CMD
+runImportCommand $testName $dockerImage $hostDataPath $containerDataPath
 echo "[$testName] Waiting $waitInterval for import command to finish"
 sleep $waitInterval
 echo "[$testName] Stopping docker container"
