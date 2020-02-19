@@ -1,0 +1,31 @@
+#!/bin/bash
+set -e
+source common/variables
+source common/functions
+
+waitInterval="5s"
+################################################################################
+########## PREPARE WORKSPACE FOR TEST CASE #####################################
+echo "Cleaning output directory"
+rm -Rf $OUT_DIR
+testName=$1
+dockerImage=$2
+inputDirectory="input/test/$3"
+outputDirectory="$OUT_DIR/$testName/"
+mkdir -p $outputDirectory
+hostDataPath=$(getAbsolutePath $outputDirectory)
+cp -R $inputDirectory/* $outputDirectory
+containerDataPath="/home/besu"
+################################################################################
+
+################################################################################
+########## RUN IMPORT COMMAND ##################################################
+runImportCommand $testName $dockerImage $hostDataPath $containerDataPath
+sleep $waitInterval
+shutdownDocker $testName
+################################################################################
+
+################################################################################
+########## RUN BESU WITH JSON RPC ##############################################
+runBesu $testName $dockerImage $hostDataPath $containerDataPath
+################################################################################

@@ -1,0 +1,48 @@
+#!/bin/bash
+set -e
+run()  {
+	CMD=$1
+	echo $CMD
+	eval $CMD
+	echo "\n"
+}
+
+runSilently()  {
+	CMD=$1
+	echo $CMD
+	(eval $CMD &) &> /dev/null
+	echo "\n"
+}
+
+getAbsolutePath() {
+  # $1 : relative filename
+  echo "$(cd "$(dirname "$1")" && pwd)/$(basename "$1")"
+}
+
+shutdownDocker() {
+  docker stop $1
+	docker rm $1
+}
+
+
+runImportCommand() {
+	testName=$1
+	echo "[$testName] Running import command"
+	dockerImage=$2
+	hostDataPath=$3
+	containerDataPath=$4
+	CMD="docker run --name $testName -d --mount type=bind,source=$hostDataPath,target=$containerDataPath $dockerImage --data-path=$containerDataPath --genesis-file=$containerDataPath/genesis.json blocks import --from=$containerDataPath/ropsten-10-blocks.bin"
+	echo $CMD
+	eval $CMD
+}
+
+runBesu() {
+	testName=$1
+	echo "[$testName] Running besu"
+	dockerImage=$2
+	hostDataPath=$3
+	containerDataPath=$4
+	CMD="docker run -p 8545:8545 --name $testName -d --mount type=bind,source=$hostDataPath,target=$containerDataPath $dockerImage --data-path=$containerDataPath --genesis-file=$containerDataPath/genesis.json --rpc-http-enabled"
+	echo $CMD
+	eval $CMD
+}
