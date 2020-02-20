@@ -27,27 +27,65 @@ shutdownDocker() {
 
 runImportCommand() {
 	testName=$1
-	echo "[$testName] Running import command"
+	#echo "[$testName] Running import command"
 	dockerImage=$2
 	hostDataPath=$3
 	containerDataPath=$4
 	CMD="docker run --name $testName -d --mount type=bind,source=$hostDataPath,target=$containerDataPath $dockerImage --data-path=$containerDataPath --genesis-file=$containerDataPath/genesis.json blocks import --from=$containerDataPath/ropsten-10-blocks.bin"
-	echo $CMD
+	#echo $CMD
 	eval $CMD
 }
 
 runBesu() {
 	testName=$1
-	echo "[$testName] Running besu"
+	#echo "[$testName] Running besu"
 	dockerImage=$2
 	hostDataPath=$3
 	containerDataPath=$4
 	CMD="docker run -p 8545:8545 --name $testName -d --mount type=bind,source=$hostDataPath,target=$containerDataPath $dockerImage --data-path=$containerDataPath --genesis-file=$containerDataPath/genesis.json --rpc-http-enabled --rpc-http-apis=ETH,NET,WEB3,DEBUG,ADMIN"
-	echo $CMD
+	#echo $CMD
 	eval $CMD
 }
 
 eth_blockNumber() {
-	HEX=`curl -H 'Content-Type: application/json' --fail -s --data '{"id":2,"jsonrpc":"2.0","method":"eth_blockNumber","params":[]}' $JSON_RPC_ENDPOINT | jq -r '.result'`
+	out=`curl -H 'Content-Type: application/json' --fail -s --data '{"id":2,"jsonrpc":"2.0","method":"eth_blockNumber","params":[]}' $JSON_RPC_ENDPOINT | jq -r '.result'`
+	echo $out
+}
+
+eth_getBalance() {
+	accountAddress=$1
+	PAYLOAD="'{\"jsonrpc\":\"2.0\",\"method\":\"eth_getBalance\",\"params\":[\"$accountAddress\", \"latest\"],\"id\":1}'"
+	CMD="curl -H 'Content-Type: application/json' --fail -s --data $PAYLOAD $JSON_RPC_ENDPOINT | jq -r '.result'"
+	out="$( eval $CMD)"
+	echo $out
+}
+
+getExpectedBlockNumber(){
+	file=$1
+	out="$(cat $file | awk '{print $1}')"
+	echo $out
+}
+
+getExpectedAddress(){
+	file=$1
+	out="$(cat $file | awk '{print $2}')"
+	echo $out
+}
+
+getExpectedBalance(){
+	file=$1
+	out="$(cat $file | awk '{print $3}')"
+	echo $out
+}
+
+toHex() {
+	DECIMAL=$1
+	HEX="$(printf '0x%X\n' $DECIMAL)"
 	echo $HEX
+}
+
+toDecimal() {
+	HEX=$1
+	DECIMAL=$((HEX))
+	echo $DECIMAL
 }
