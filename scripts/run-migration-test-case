@@ -16,16 +16,25 @@ mkdir -p $outputDirectory
 hostDataPath=$(getAbsolutePath $outputDirectory)
 cp -R $inputDirectory/* $outputDirectory
 containerDataPath="/home/besu"
+expectedResults=$outputDirectory/expected-results
+docker pull $dockerImage &> /dev/null
 ################################################################################
 
 ################################################################################
 ########## RUN IMPORT COMMAND ##################################################
 runImportCommand $testName $dockerImage $hostDataPath $containerDataPath
 sleep $waitInterval
+#docker logs $testName
 shutdownDocker $testName
 ################################################################################
 
 ################################################################################
 ########## RUN BESU WITH JSON RPC ##############################################
 runBesu $testName $dockerImage $hostDataPath $containerDataPath
+sleep $waitInterval
 ################################################################################
+
+HEX="$(eth_blockNumber)"
+echo "[$testName] eth_blockNumber: $HEX"
+
+shutdownDocker $testName
