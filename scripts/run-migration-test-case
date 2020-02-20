@@ -9,20 +9,22 @@ waitInterval="5s"
 #echo "Cleaning output directory"
 rm -Rf $OUT_DIR
 testName=$1
-dockerImage=$2
-inputDirectory="input/test/$3"
+sourceDockerImage=$2
+targetDockerImage=$3
+inputDirectory="input/test/$4"
 outputDirectory="$OUT_DIR/$testName/"
 mkdir -p $outputDirectory
 hostDataPath=$(getAbsolutePath $outputDirectory)
 cp -R $inputDirectory/* $outputDirectory
 containerDataPath="/home/besu"
 expectedResults=$outputDirectory/expected-results
-docker pull $dockerImage &> /dev/null
+docker pull $sourceDockerImage &> /dev/null
+docker pull $targetDockerImage &> /dev/null
 ################################################################################
 
 ################################################################################
 ########## RUN IMPORT COMMAND ##################################################
-runImportCommand $testName $dockerImage $hostDataPath $containerDataPath &> /dev/null
+runImportCommand $testName $sourceDockerImage $hostDataPath $containerDataPath &> /dev/null
 sleep $waitInterval
 #docker logs $testName
 shutdownDocker $testName &> /dev/null
@@ -30,7 +32,7 @@ shutdownDocker $testName &> /dev/null
 
 ################################################################################
 ########## RUN BESU WITH JSON RPC ##############################################
-runBesu $testName $dockerImage $hostDataPath $containerDataPath &> /dev/null
+runBesu $testName $targetDockerImage $hostDataPath $containerDataPath &> /dev/null
 sleep $waitInterval
 ################################################################################
 
