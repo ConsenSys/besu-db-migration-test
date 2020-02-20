@@ -6,7 +6,7 @@ source common/functions
 waitInterval="5s"
 ################################################################################
 ########## PREPARE WORKSPACE FOR TEST CASE #####################################
-echo "Cleaning output directory"
+#echo "Cleaning output directory"
 rm -Rf $OUT_DIR
 testName=$1
 dockerImage=$2
@@ -22,19 +22,27 @@ docker pull $dockerImage &> /dev/null
 
 ################################################################################
 ########## RUN IMPORT COMMAND ##################################################
-runImportCommand $testName $dockerImage $hostDataPath $containerDataPath
+runImportCommand $testName $dockerImage $hostDataPath $containerDataPath &> /dev/null
 sleep $waitInterval
 #docker logs $testName
-shutdownDocker $testName
+shutdownDocker $testName &> /dev/null
 ################################################################################
 
 ################################################################################
 ########## RUN BESU WITH JSON RPC ##############################################
-runBesu $testName $dockerImage $hostDataPath $containerDataPath
+runBesu $testName $dockerImage $hostDataPath $containerDataPath &> /dev/null
 sleep $waitInterval
 ################################################################################
 
-HEX="$(eth_blockNumber)"
-echo "[$testName] eth_blockNumber: $HEX"
+expectedBlockNumber="$(getExpectedBlockNumber $expectedResults)"
+echo "[$testName] expected blockNumber: $expectedBlockNumber"
+actualBlockNumber="$(eth_blockNumber)"
+echo "[$testName] actual blockNumber: $actualBlockNumber"
 
-shutdownDocker $testName
+accountAddress="$(getExpectedAddress $expectedResults)"
+expectedBalance="$(getExpectedBalance $expectedResults)"
+echo "[$testName] expected balance: $expectedBalance"
+actualBalance="$(eth_getBalance $accountAddress)"
+echo "[$testName] actual balance: $actualBalance"
+
+shutdownDocker $testName &> /dev/null

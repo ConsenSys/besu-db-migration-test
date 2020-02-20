@@ -3,8 +3,5 @@ set -e
 source common/variables
 source common/functions
 
-besuPreVersioningTestCase='Before_Versioning_Was_Enabled'
-besuPreVersioningDockerImage="docker.io/pegasyseng/pantheon:1.2.0"
-#besuPreVersioningDockerImage="hyperledger/besu:1.4.1-SNAPSHOT"
-besuPreVersioningInputDirectory="version0"
-sh scripts/run-migration-test-case $besuPreVersioningTestCase $besuPreVersioningDockerImage $besuPreVersioningInputDirectory
+sh scripts/run-migration-test-case Before_Versioning_Was_Enabled docker.io/pegasyseng/pantheon:1.2.0 version0
+sh scripts/run-migration-test-case After_Versioning_Was_Enabled docker.io/pegasyseng/pantheon:1.2.1 version1
