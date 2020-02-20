@@ -3,5 +3,7 @@ set -e
 source common/variables
 source common/functions
 
-sh scripts/run-migration-test-case Before_Versioning_Was_Enabled docker.io/pegasyseng/pantheon:1.2.0 version0
-sh scripts/run-migration-test-case After_Versioning_Was_Enabled docker.io/pegasyseng/pantheon:1.2.1 version1
+targetDockerImage="hyperledger/besu:1.4.1-SNAPSHOT"
+sh scripts/run-migration-test-case Before_Versioning_Was_Enabled docker.io/pegasyseng/pantheon:1.2.0 $targetDockerImage version0
+sleep 5s
+sh scripts/run-migration-test-case After_Versioning_Was_Enabled docker.io/pegasyseng/pantheon:1.2.1 $targetDockerImage version1

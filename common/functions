@@ -89,3 +89,9 @@ toDecimal() {
 	DECIMAL=$((HEX))
 	echo $DECIMAL
 }
+
+runBesuWithExistingDB() {
+	dataPath=$1
+	CMD="$ENV_BESU_PATH --rpc-http-port=8545 --p2p-enabled=false --data-path=$dataPath --genesis-file=$dataPath/genesis.json --rpc-http-enabled --rpc-http-apis=ETH,NET,WEB3,DEBUG,ADMIN"
+	eval $CMD
+}
